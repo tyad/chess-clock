@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>timer</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- polymer -->
+    <script src="/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+    <!-- components -->
+    <link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+	<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+	<link rel="import" href="/bower_components/iron-icons/av-icons.html">
+	<link rel="import" href="/bower_components/paper-button/paper-button.html">
+
+    <!-- original components -->
+	<link rel="import" href="/my_components/timedisplay-button/timedisplay-button.html">
+	<link rel="import" href="/my_components/progresstype-button/progresstype-button.html">
+
+	<style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+   	<style type="text/css">
+	html,body {
+		height: 100%;
+		margin: 0;
+		background-color: #e1f5fe;
+		font-family: "メイリオ",sans-serif;
+	}
+	audio{
+		display: none;
+	}
+	.timer{
+		display: block;
+		height: 35%;
+		width: 90%;
+		margin-left: 5%;
+	}
+	.start-timer{
+		color: #ffffff;
+		background-color: #039be5;
+	}
+	.stop-timer{
+		background-color: #b3e5fc;
+	}
+	.optionbutton{
+		height: 60%;
+		width: 20%;
+		color: #ffffff;
+		background-color: #4fc3f7;
+	}
+	#contents{
+		height: 100%;
+	}
+	#top{
+		transform:rotate(180deg);
+		position: absolute;
+		top: 5%;
+	}
+	#options{
+		position: absolute;
+		top: 40%;
+		height: 20%;
+		width: 90%;
+		margin-left: 5%;
+	}
+	#bottom{
+		position: absolute;
+		bottom: 5%;
+	}
+	</style>
+    <script>
+		(function() {
+		    const PROGRESSTYPE_POSITIVE = "positive";
+    		const PROGRESSTYPE_NEGATIVE = "negative";
+   		    const STATE_STOP = 0;
+		    const STATE_START = 1;
+
+    		window.onload = function(){
+    			// flags.
+    			var soundOn = false;
+
+    			// select doms.
+				var $top = document.querySelector("#top");
+				var $bottom = document.querySelector("#bottom");
+				var $reset = document.querySelector("#reset");
+				var $stop = document.querySelector("#stop");
+				var $changetype = document.querySelector("#changetype");
+				var $open_ru = document.querySelector("#open_ru");
+
+				// define function.
+				var initTimerDesign = function(){
+					setTimerDesignStart($top);
+					setTimerDesignStart($bottom);
+				};
+				var setTimerDesignStop = function(_target){
+					var $target = _target;
+					$target.disabled = true;
+					if($target.classList.contains("start-timer") == true){
+						$target.classList.remove("start-timer");
+					}
+					if($target.classList.contains("stop-timer") == false){
+						$target.classList.add("stop-timer");
+					}
+				};
+				var setTimerDesignStart = function(_target){
+					var $target = _target;
+					$target.disabled = false;
+					if($target.classList.contains("stop-timer") == true){
+						$target.classList.remove("stop-timer");
+					}
+					if($target.classList.contains("start-timer") == false){
+						$target.classList.add("start-timer");
+					}
+				};
+				var reset = function(){
+					initTimerDesign();
+					$top.resetTimer();
+					$bottom.resetTimer();
+				};
+				var stop = function(){
+					initTimerDesign();
+					$top.stopTimer();
+					$bottom.stopTimer();
+				};
+				var changePositive = function(){
+					$top.setProgressType("positive");
+					$bottom.setProgressType("positive");
+					$top.setStartTime(0,0);
+					$bottom.setStartTime(0,0);
+				}
+				var changeNegative = function(){
+					$top.setProgressType("negative");
+					$bottom.setProgressType("negative");
+					$top.setStartTime(15,0);
+					$bottom.setStartTime(15,0);
+				}
+				var playOpenVoice = function(){
+					if(soundOn){
+						$open_ru.load();
+						$open_ru.play();
+					}
+				}
+				var getUrlQuerys = function() {
+					var querys = [];
+					var query_list = window.location.search.substring(1).split('&');
+					var tmp_arr;
+					query_list.forEach( function(e, i, a) {
+						tmp_arr = e.split('=');
+						querys[ tmp_arr[0] ] = tmp_arr[1];
+					})
+					return querys;
+				}
+
+				// check hash.
+				var urlQuerys = getUrlQuerys();
+				if(urlQuerys['sound'] === "on"){
+		        	soundOn = true;
+		        }
+
+				// initialize design.
+				initTimerDesign();
+
+				// regist on-tap.
+				$top.registHandleTap(function(){
+					if( ($top.getState() == $bottom.getState()) && $top.getState() == STATE_STOP ){
+						playOpenVoice();
+					}
+					setTimerDesignStop($top);
+					setTimerDesignStart($bottom);
+					$top.stopTimer();
+					$bottom.startTimer();
+				});
+				$bottom.registHandleTap(function(){
+					if( ($top.getState() == $bottom.getState()) && $top.getState() == STATE_STOP ){
+						playOpenVoice();
+					}
+					setTimerDesignStop($bottom);
+					setTimerDesignStart($top);
+					$bottom.stopTimer();
+					$top.startTimer();
+				});
+				$reset.onclick = reset;
+				$stop.onclick = stop;
+				$changetype.registHandleTap(function(){
+					stop();
+					reset();
+					if($top.getProgressType() == PROGRESSTYPE_POSITIVE){
+						changeNegative();
+					}else{
+						changePositive();
+					}
+					$changetype.toggleProgressType();
+				});
+
+				// regist count-end.
+				$top.registHandleCountEnd(function(){
+					//alert("end");
+				});
+				$bottom.registHandleCountEnd(function(){
+					//alert("end");
+				});
+			}
+		})();
+  	</script>
+</head>
+<body>
+	<!-- display -->
+	<div id='contents'>
+		<timedisplay-button class="timer" id="top"></timedisplay-button>
+		<div id="options" class="layout horizontal center center-justified">
+			<!-- buttons -->
+			<paper-button raised id="reset" class="optionbutton horizontal layout center center-justified">
+				<iron-icon icon="av:replay"></iron-icon>
+			</paper-button>
+			<paper-button raised id="stop" class="optionbutton horizontal layout center center-justified">
+				<iron-icon icon="av:pause"></iron-icon>
+			</paper-button>
+			<progresstype-button id="changetype" class="optionbutton"></progresstype-button>
+		</div>
+		<timedisplay-button class="timer" id="bottom"></timedisplay-button>
+	</div>
+
+	<!-- hidden -->
+	<audio autobuffer id="open_ru">
+		<source src="/sound/open_ru.mp3">
+	</audio>
+</body>
+</html>

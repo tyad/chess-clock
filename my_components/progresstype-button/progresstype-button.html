@@ -1,0 +1,100 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+
+<dom-module id="progresstype-button">
+  <style>
+    :host{
+      margin: 0 0.29em; /* paper button */
+    }
+    :host #button {
+      display: inherit;
+      height: 100%;
+      width: 100%;
+      margin: 0px;
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
+      @apply(--layout-center-justified);
+    }
+  </style>
+
+  <template>
+    <paper-button raised id="button" on-tap="handleTap">
+        <iron-icon icon="icons:alarm"></iron-icon>
+        <iron-icon icon="icons:expand-less" id="progresstype"></iron-icon>
+    </paper-button>
+  </template>
+</dom-module>
+
+<script>
+  (function() {
+    const PROGRESSTYPE_POSITIVE = "positive";
+    const PROGRESSTYPE_NEGATIVE = "negative";
+
+    Polymer({
+      is: 'progresstype-button',
+
+      // ----------
+      // properties.
+      // ----------
+      properties: {
+        progressType: {
+          type: String,
+          value: PROGRESSTYPE_POSITIVE,
+          observer: "_onChangeProgressType"
+        },
+        handleTap: {
+          type: Object,
+          value: null
+        }
+      },
+
+      ready: function(){
+      },
+
+      // --------------------
+      // public functions.
+      // --------------------
+      registHandleTap: function(_func){
+        this.handleTap = _func;
+      },
+
+      getProgressType: function(){
+        return this.progressType;
+      },
+
+      setProgressType: function(_progressType){
+        switch(_progressType){
+          case PROGRESSTYPE_POSITIVE:
+          case PROGRESSTYPE_NEGATIVE:
+            this.progressType = _progressType;
+            break;
+          default:
+            throw new Error(this.is+":"+"setProgressType"+":"+"illegal progressType");
+            break;
+        }
+      },
+
+      toggleProgressType: function(){
+        if(this.progressType == PROGRESSTYPE_POSITIVE){
+          this.progressType = PROGRESSTYPE_NEGATIVE;
+        }else{
+          this.progressType = PROGRESSTYPE_POSITIVE;
+        }
+      },
+
+      // --------------------
+      // private functions.
+      // --------------------
+      _onChangeProgressType: function(){
+        if(this.progressType == PROGRESSTYPE_POSITIVE){
+          this.$.progresstype.icon = "icons:remove-circle-outline";
+        }else{
+          this.$.progresstype.icon = "icons:add-circle-outline";
+        }
+      }
+    });
+
+  })();
+</script>

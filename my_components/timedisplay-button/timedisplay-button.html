@@ -1,0 +1,218 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+
+<dom-module id="timedisplay-button">
+  <style>
+    :host{
+      margin: 0 0.29em; /* paper button */
+    }
+    :host #button {
+      background-color: transparent;
+      display: inherit;
+      height: 100%;
+      width: 100%;
+      font-size: 60px;
+      margin: 0;
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
+      @apply(--layout-center-justified);
+    }
+  </style>
+
+  <template>
+    <paper-button raised id="button" disabled="{{disabled}}" on-tap="handleTap">{{time}}</paper-button>
+  </template>
+</dom-module>
+
+<script>
+  (function() {
+    const DEFAULT_INTERVALID = 0;
+    const TIME_DEFAULT = "00:00";
+    const TIME_MAX = 59;
+    const TIME_MIN = 0;
+    const ZEROPADDING_DIGITS = 2;
+    const STATE_STOP = 0;
+    const STATE_START = 1;
+    const PROGRESSTYPE_POSITIVE = "positive";
+    const PROGRESSTYPE_NEGATIVE = "negative";
+
+    Polymer({
+      is: 'timedisplay-button',
+
+      // ----------
+      // properties.
+      // ----------
+      properties: {
+        time: {
+          type: String,
+          value: TIME_DEFAULT
+        },
+        timeMinute: {
+          type: Number,
+          value: 0
+        },
+        timeSecond: {
+          type: Number,
+          value: 0
+        },
+        state: {
+          type: Number,
+          value: STATE_STOP
+        },
+        disabled: {
+          type: Boolean,
+          value: false,
+        },
+        handleTap: {
+          type: Object,
+          value: null
+        },
+        handleCountEnd: {
+          type: Object,
+          value: null
+        },
+        startTimeMinute: {
+          type: Number,
+          value: 0
+        },
+        startTimeSecond: {
+          type: Number,
+          value: 0
+        },
+        progressType: {
+          type: String,
+          value: PROGRESSTYPE_POSITIVE
+        },
+        intervalId: {
+          type: Number,
+          value: DEFAULT_INTERVALID
+        }
+      },
+
+      ready: function(){
+      },
+
+      // --------------------
+      // public functions.
+      // --------------------
+      registHandleTap: function(_func){
+        this.handleTap = _func;
+      },
+
+      registHandleCountEnd: function(_func){
+        this.handleCountEnd = _func;
+      },
+
+      setStartTime: function(_minute, _second){
+        this.startTimeMinute = _minute;
+        this.startTimeSecond = _second;
+        this.initTimer();
+      },
+
+      setProgressType: function(_progressType){
+        switch(_progressType){
+          case PROGRESSTYPE_POSITIVE:
+          case PROGRESSTYPE_NEGATIVE:
+            this.progressType = _progressType;
+            break;
+          default:
+            throw new Error(this.is+":"+"setProgressType"+":"+"illegal progressType");
+            break;
+        }
+      },
+
+      getProgressType: function(){
+        return this.progressType;
+      },
+
+      getState: function(){
+        return this.state;
+      },
+
+      initTimer: function(){
+        this.stopTimer();
+        this.timeMinute = this.startTimeMinute;
+        this.timeSecond = this.startTimeSecond;
+        this.time = this._convertTimeString();
+      },
+
+      startTimer: function(){
+        if(this.state == STATE_STOP){
+          this.intervalId = setInterval(this._enterframe.bind(this), 1000);
+          this.state = STATE_START;
+        }
+      },
+
+      stopTimer: function() {
+        if(this.state == STATE_START){
+          clearInterval(this.intervalId);
+          this.intervalId = DEFAULT_INTERVALID;
+          this.state = STATE_STOP;
+        }
+      },
+
+      resetTimer: function(){
+         this.initTimer();
+      },
+
+      // --------------------
+      // private functions.
+      // --------------------
+
+      _zeroPadding: function(number, digit) {
+        var numberLength = String(number).length;
+        if(digit > numberLength){
+            return (new Array((digit - numberLength) + 1).join(0)) + number;
+        } else {
+            return number;
+        }
+      },
+
+      _convertTimeString: function(){
+        var second = this._zeroPadding(this.timeSecond, ZEROPADDING_DIGITS);
+        var minute = this._zeroPadding(this.timeMinute, ZEROPADDING_DIGITS);
+        return minute + ":" + second;
+      },
+
+      _countDown: function(){
+        this.timeSecond--;
+        if(this.timeSecond < TIME_MIN){
+          this.timeSecond = 59;
+          this.timeMinute--;
+          if(this.timeMinute < TIME_MIN){
+            this.stopTimer();
+            this.timeSecond = TIME_MIN;
+            this.timeMinute = TIME_MIN;
+            this.handleCountEnd();
+          }
+        }
+      },
+
+      _countUp: function(){
+        this.timeSecond++;
+        if(this.timeSecond > TIME_MAX){
+          this.timeSecond = 0;
+          this.timeMinute++;
+          if(this.timeMinute > TIME_MAX){
+            this.timerStop();
+            this.timeSecond = TIME_MAX;
+            this.timeMinute = TIME_MAX;
+            this.handleCountEnd();
+          }
+        }
+      },
+
+      _enterframe: function() {
+        if(this.progressType == PROGRESSTYPE_NEGATIVE){
+          this._countDown();
+        }
+        else{
+          this._countUp();
+        }
+        this.time = this._convertTimeString();
+      }
+    });
+
+  })();
+</script>
