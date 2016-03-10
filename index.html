@@ -152,17 +152,18 @@
 					})
 					return querys;
 				}
-				var loadAudio = function(){
-					if(soundOn && (loaded === false)){
+				var toggleVolumeSwitch(){
+					if(loaded === false){
 						$open_ru.load();
 						loaded = true;
 					}
+					soundOn = !soundOn;
 				}
 
 				// check hash.
 				var urlQuerys = getUrlQuerys();
 				if(urlQuerys['sound'] === "on"){
-		        	soundOn = true;
+		        	$sound.hidden = false;
 		        }
 
 				// initialize design.
@@ -199,7 +200,7 @@
 					}
 					$changetype.toggleProgressType();
 				});
-				$sound.onclick = loadAudio;
+				$sound.onclick = toggleVolumeSwitch;
 
 				// regist count-end.
 				$top.registHandleCountEnd(function(){
@@ -225,7 +226,7 @@
 				<iron-icon icon="av:pause"></iron-icon>
 			</paper-button>
 			<progresstype-button id="changetype" class="optionbutton"></progresstype-button>
-			<sound-button id="sound" class="optionbutton"></sound-button>
+			<sound-button id="sound" class="optionbutton" hidden="true"></sound-button>
 		</div>
 		<timedisplay-button class="timer" id="bottom"></timedisplay-button>
 	</div>
