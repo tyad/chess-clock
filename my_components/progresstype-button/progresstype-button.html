@@ -23,7 +23,7 @@
   <template>
     <paper-button raised id="button" on-tap="handleTap">
         <iron-icon icon="icons:alarm"></iron-icon>
-        <iron-icon icon="icons:expand-less" id="progresstype"></iron-icon>
+        <iron-icon icon="icons:add-circle-outline" id="progresstype"></iron-icon>
     </paper-button>
   </template>
 </dom-module>
@@ -89,10 +89,10 @@
       // private functions.
       // --------------------
       _onChangeProgressType: function(){
-        if(this.progressType == PROGRESSTYPE_POSITIVE){
-          this.$.progresstype.icon = "icons:remove-circle-outline";
-        }else{
+        if(this.progressType === PROGRESSTYPE_POSITIVE){
           this.$.progresstype.icon = "icons:add-circle-outline";
+        }else{
+          this.$.progresstype.icon = "icons:remove-circle-outline";
         }
       }
     });
