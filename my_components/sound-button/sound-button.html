@@ -1,0 +1,72 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="sound-button">
+  <style>
+    :host{
+      margin: 0 0.29em; /* paper button */
+    }
+    :host #button {
+      display: inherit;
+      height: 100%;
+      width: 100%;
+      min-width: initial;
+      margin: 0px;
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
+      @apply(--layout-center-justified);
+    }
+  </style>
+
+  <template>
+    <paper-button raised id="button" on-tap="toggleVolumeSwitch">
+        <iron-icon icon="{{volumeSwitch}}" id="icon"></iron-icon>
+    </paper-button>
+  </template>
+</dom-module>
+
+<script>
+  (function() {
+    const VOLUMESWITCH_OFF = "av:volume-off";
+    const VOLUMESWITCH_ON = "av:volume-up";
+
+    Polymer({
+      is: 'sound-button',
+
+      // ----------
+      // properties.
+      // ----------
+      properties: {
+        volumeSwitch: {
+          type: String,
+          value: VOLUMESWITCH_OFF
+        }
+      },
+
+      ready: function(){
+      },
+
+      // --------------------
+      // public functions.
+      // --------------------
+      volumeSwitchOn: function(){
+        this.volumeSwitch = VOLUMESWITCH_ON;
+      },
+
+      volumeSwitchOff: function(){
+        this.volumeSwitch = VOLUMESWITCH_OFF;
+      },
+
+      toggleVolumeSwitch: function(){
+        if(this.volumeSwitch === VOLUMESWITCH_OFF){
+          this.volumeSwitch = VOLUMESWITCH_ON;
+        }else{
+          this.volumeSwitch = VOLUMESWITCH_OFF;
+        }
+      }
+    });
+
+  })();
+</script>

@@ -6,17 +6,18 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<!-- polymer -->
-    <script src="/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="./bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
 
     <!-- components -->
-    <link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-	<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
-	<link rel="import" href="/bower_components/iron-icons/av-icons.html">
-	<link rel="import" href="/bower_components/paper-button/paper-button.html">
+    <link rel="import" href="./bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+	<link rel="import" href="./bower_components/iron-icons/iron-icons.html">
+	<link rel="import" href="./bower_components/iron-icons/av-icons.html">
+	<link rel="import" href="./bower_components/paper-button/paper-button.html">
 
     <!-- original components -->
-	<link rel="import" href="/my_components/timedisplay-button/timedisplay-button.html">
-	<link rel="import" href="/my_components/progresstype-button/progresstype-button.html">
+	<link rel="import" href="./my_components/timedisplay-button/timedisplay-button.html">
+	<link rel="import" href="./my_components/progresstype-button/progresstype-button.html">
+	<link rel="import" href="./my_components/sound-button/sound-button.html">
 
 	<style is="custom-style" include="iron-flex iron-flex-alignment"></style>
    	<style type="text/css">
@@ -78,6 +79,7 @@
     		window.onload = function(){
     			// flags.
     			var soundOn = false;
+    			var loaded = false;
 
     			// select doms.
 				var $top = document.querySelector("#top");
@@ -85,6 +87,7 @@
 				var $reset = document.querySelector("#reset");
 				var $stop = document.querySelector("#stop");
 				var $changetype = document.querySelector("#changetype");
+    			var $sound = document.querySelector("#sound");
 				var $open_ru = document.querySelector("#open_ru");
 
 				// define function.
@@ -135,8 +138,7 @@
 					$bottom.setStartTime(15,0);
 				}
 				var playOpenVoice = function(){
-					if(soundOn){
-						$open_ru.load();
+					if(soundOn && loaded){
 						$open_ru.play();
 					}
 				}
@@ -149,6 +151,12 @@
 						querys[ tmp_arr[0] ] = tmp_arr[1];
 					})
 					return querys;
+				}
+				var loadAudio = function(){
+					if(soundOn && (loaded === false)){
+						$open_ru.load();
+						loaded = true;
+					}
 				}
 
 				// check hash.
@@ -191,6 +199,7 @@
 					}
 					$changetype.toggleProgressType();
 				});
+				$sound.onclick = loadAudio;
 
 				// regist count-end.
 				$top.registHandleCountEnd(function(){
@@ -216,13 +225,14 @@
 				<iron-icon icon="av:pause"></iron-icon>
 			</paper-button>
 			<progresstype-button id="changetype" class="optionbutton"></progresstype-button>
+			<sound-button id="sound" class="optionbutton"></sound-button>
 		</div>
 		<timedisplay-button class="timer" id="bottom"></timedisplay-button>
 	</div>
 
 	<!-- hidden -->
 	<audio autobuffer id="open_ru">
-		<source src="/sound/open_ru.mp3">
+		<source src="./sound/open_ru.mp3">
 	</audio>
 </body>
 </html>
