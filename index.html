@@ -88,7 +88,8 @@
 				var $stop = document.querySelector("#stop");
 				var $changetype = document.querySelector("#changetype");
     			var $sound = document.querySelector("#sound");
-				var $open_ru = document.querySelector("#open_ru");
+				var $s_count = document.querySelector("#s_count");
+				var $s_change = document.querySelector("#s_change");
 
 				// define function.
 				var initTimerDesign = function(){
@@ -130,16 +131,16 @@
 					$bottom.setProgressType("positive");
 					$top.setStartTime(0,0);
 					$bottom.setStartTime(0,0);
-				}
+				};
 				var changeNegative = function(){
 					$top.setProgressType("negative");
 					$bottom.setProgressType("negative");
 					$top.setStartTime(15,0);
 					$bottom.setStartTime(15,0);
-				}
-				var playOpenVoice = function(){
+				};
+				var playSound = function(_$sound){
 					if(soundOn && loaded){
-						$open_ru.play();
+						_$sound.play();
 					}
 				}
 				var getUrlQuerys = function() {
@@ -151,10 +152,11 @@
 						querys[ tmp_arr[0] ] = tmp_arr[1];
 					})
 					return querys;
-				}
+				};
 				var toggleVolumeSwitch = function(){
 					if(loaded === false){
-						$open_ru.load();
+						$s_change.load();
+						$s_count.load();
 						loaded = true;
 					}
 					soundOn = !soundOn;
@@ -169,24 +171,28 @@
 				// initialize design.
 				initTimerDesign();
 
+				// regist counting.
+				$top.registHandleCounting(function(){
+					playSound($s_count);
+				});
+				$bottom.registHandleCounting(function(){
+					playSound($s_count);
+				});
+
 				// regist on-tap.
 				$top.registHandleTap(function(){
-					if( ($top.getState() == $bottom.getState()) && $top.getState() == STATE_STOP ){
-						playOpenVoice();
-					}
 					setTimerDesignStop($top);
 					setTimerDesignStart($bottom);
 					$top.stopTimer();
 					$bottom.startTimer();
+					playSound($s_change);
 				});
 				$bottom.registHandleTap(function(){
-					if( ($top.getState() == $bottom.getState()) && $top.getState() == STATE_STOP ){
-						playOpenVoice();
-					}
 					setTimerDesignStop($bottom);
 					setTimerDesignStart($top);
 					$bottom.stopTimer();
 					$top.startTimer();
+					playSound($s_change);
 				});
 				$reset.onclick = reset;
 				$stop.onclick = stop;
@@ -232,8 +238,11 @@
 	</div>
 
 	<!-- hidden -->
-	<audio autobuffer id="open_ru">
-		<source src="./sound/open_ru.mp3">
+	<audio autobuffer id="s_count">
+		<source src="./sound/count.mp3">
+	</audio>
+	<audio autobuffer id="s_change">
+		<source src="./sound/change.mp3">
 	</audio>
 </body>
 </html>

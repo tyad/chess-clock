@@ -72,6 +72,10 @@
           type: Object,
           value: null
         },
+        handleCounting: {
+          type: Object,
+          value: null
+        },
         startTimeMinute: {
           type: Number,
           value: 0
@@ -102,6 +106,10 @@
 
       registHandleCountEnd: function(_func){
         this.handleCountEnd = _func;
+      },
+
+      registHandleCounting: function(_func){
+        this.handleCounting = _func;
       },
 
       setStartTime: function(_minute, _second){
@@ -211,6 +219,7 @@
           this._countUp();
         }
         this.time = this._convertTimeString();
+        this.handleCounting();
       }
     });
 
